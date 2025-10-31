@@ -1,0 +1,24 @@
+{# templates/inventory/tabs/_maintenance.html #}
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-lg font-semibold">Mantenimiento</h2>
+
+  <button id="btn-add-maint" class="btn btn-primary" hx-get="{% url 'inventory:maintenance_create' company.id %}"
+    hx-target="#modal" hx-swap="innerHTML" hx-push-url="false" hx-sync="this:queue all">
+    <svg class="htmx-indicator hidden h-4 w-4 animate-spin" viewBox="0 0 24 24" aria-hidden="true">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+    </svg>
+    <span>+ Plan / tarea</span>
+  </button>
+</div>
+
+<div id="maintenance-table" hx-get="{% url 'inventory:maintenance_list' company.id %}" {# placeholder: cambia por tu
+  endpoint real de mantenimiento #} hx-trigger="load, maintenance:refresh from:body" hx-target="this" hx-swap="innerHTML">
+  <div class="flex items-center gap-2 text-sm text-gray-500">
+    <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+    </svg>
+    Cargando mantenimiento…
+  </div>
+</div>

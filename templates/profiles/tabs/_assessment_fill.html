@@ -1,0 +1,173 @@
+{% load profiles_extras %}
+
+<div class="flex items-center justify-between mb-4">
+    <div>
+        <p class="text-xs uppercase tracking-wide text-gray-400">Evaluación</p>
+        <h2 class="text-lg font-semibold text-gray-900">
+            {{ assessment.instrument_code }} {{ assessment.instrument_version }}
+        </h2>
+        <p class="text-sm text-gray-500">Empresa: {{ company.name }}</p>
+    </div>
+
+    <div class="flex gap-2">
+        <button type="button" hx-get="{% url 'profiles:assessment_list' company.id %}" hx-target="#tab-content"
+            hx-swap="innerHTML"
+            class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 text-sm hover:bg-gray-50">
+            ← Regresar
+        </button>
+    </div>
+</div>
+
+<form method="post" hx-post="{% url 'profiles:assessment_fill' company.id assessment.id %}" hx-target="#tab-content"
+    hx-swap="innerHTML" class="space-y-4">
+    {% csrf_token %}
+
+    {% for dimension, subgroups in grouped_questions.items %}
+    <!-- Bloque de dimensión -->
+    <div class="bg-white rounded-2xl shadow overflow-hidden">
+        <div class="bg-emerald-50 px-4 py-3 border-b border-emerald-100 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-emerald-900">
+                {{ dimension }}
+            </h3>
+            <span class="text-xs text-emerald-700">
+                {{ subgroups|length }} grupo{{ subgroups|length|pluralize }}
+            </span>
+        </div>
+
+        <!-- dentro de la dimensión -->
+        {% for subdimension, questions in subgroups.items %}
+        {% if subdimension %}
+        <div class="px-4 pt-4 pb-1">
+            <p class="text-xs uppercase tracking-wide text-gray-400">
+                {{ subdimension }}
+            </p>
+        </div>
+        {% endif %}
+
+        {% for q in questions %}
+        {% with resp=existing_responses|get_item:q.id %}
+        <div class="p-4 space-y-4 border-t border-gray-50">
+            <!-- encabezado de la pregunta -->
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">
+                        {{ q.text }}
+                    </p>
+                    {% if not subdimension %}
+                    {# si NO hay subdimensión, mostramos la dimensión en pequeñito debajo #}
+                    {% if q.dimension %}
+                    <p class="text-xs text-gray-400">{{ q.dimension }}</p>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                <!-- puntaje -->
+                <div class="text-sm text-gray-500">
+                    <span class="text-xs uppercase tracking-wide text-gray-400 block text-right">Puntaje</span>
+                    <span
+                        class="inline-flex items-center justify-center px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-semibold"
+                        id="score-q-{{ q.id }}">
+                        {% if resp %}{{ resp.score|floatformat:0 }}{% else %}0{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- escala -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- 1 (básico) -->
+                <label class="flex gap-2 text-sm text-gray-700">
+                    <input type="radio" name="q_{{ q.id }}_answer_value" value="1" class="mt-1 q-radio shrink-0"
+                        data-score-target="score-q-{{ q.id }}" {% if resp and resp.answer_value == 1 %}checked{% endif %} />
+                    <span class="flex flex-col gap-0.5">
+                        <span class="font-semibold leading-tight">1 (básico)</span>
+                        {% if q.level_1_label %}
+                        <span class="text-xs text-gray-500 leading-snug break-words">
+                            {{ q.level_1_label }}
+                        </span>
+                        {% endif %}
+                    </span>
+                </label>
+
+                <!-- 2 (en desarrollo) -->
+                <label class="flex gap-2 text-sm text-gray-700">
+                    <input type="radio" name="q_{{ q.id }}_answer_value" value="2" class="mt-1 q-radio shrink-0"
+                        data-score-target="score-q-{{ q.id }}" {% if resp and resp.answer_value == 2 %}checked{% endif %} />
+                    <span class="flex flex-col gap-0.5">
+                        <span class="font-semibold leading-tight">2 (en desarrollo)</span>
+                        {% if q.level_2_label %}
+                        <span class="text-xs text-gray-500 leading-snug break-words">
+                            {{ q.level_2_label }}
+                        </span>
+                        {% endif %}
+                    </span>
+                </label>
+
+                <!-- 3 (consolidado) -->
+                <label class="flex gap-2 text-sm text-gray-700">
+                    <input type="radio" name="q_{{ q.id }}_answer_value" value="3" class="mt-1 q-radio shrink-0"
+                        data-score-target="score-q-{{ q.id }}" {% if resp and resp.answer_value == 3 %}checked{% endif %} />
+                    <span class="flex flex-col gap-0.5">
+                        <span class="font-semibold leading-tight">3 (consolidado)</span>
+                        {% if q.level_3_label %}
+                        <span class="text-xs text-gray-500 leading-snug break-words">
+                            {{ q.level_3_label }}
+                        </span>
+                        {% endif %}
+                    </span>
+                </label>
+
+                <!-- 4 (avanzado) -->
+                <label class="flex gap-2 text-sm text-gray-700">
+                    <input type="radio" name="q_{{ q.id }}_answer_value" value="4" class="mt-1 q-radio shrink-0"
+                        data-score-target="score-q-{{ q.id }}" {% if resp and resp.answer_value == 4 %}checked{% endif %} />
+                    <span class="flex flex-col gap-0.5">
+                        <span class="font-semibold leading-tight">4 (avanzado)</span>
+                        {% if q.level_4_label %}
+                        <span class="text-xs text-gray-500 leading-snug break-words">
+                            {{ q.level_4_label }}
+                        </span>
+                        {% endif %}
+                    </span>
+                </label>
+            </div>
+
+
+            <!-- observaciones -->
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Observaciones</label>
+                <textarea name="q_{{ q.id }}_observations" rows="2"
+                    class="w-full rounded-lg border-gray-200 focus:border-green-500 focus:ring-green-500 text-sm">{% if resp %}{{ resp.observations }}{% endif %}</textarea>
+            </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+        {% endfor %}
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-xl shadow p-4 text-sm text-gray-500">
+        No hay preguntas configuradas para este instrumento.
+    </div>
+    {% endfor %}
+
+    <div class="flex justify-end gap-2">
+        <button type="button" hx-get="{% url 'profiles:assessment_list' company.id %}" hx-target="#tab-content"
+            hx-swap="innerHTML"
+            class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 text-sm hover:bg-gray-50">
+            Cancelar
+        </button>
+        <button type="submit" class="px-3 py-1.5 rounded-lg bg-green-600 text-white text-sm hover:bg-green-700">
+            Guardar
+        </button>
+    </div>
+</form>
+
+<script>
+    document.querySelectorAll(".q-radio").forEach(function (input) {
+        input.addEventListener("change", function (e) {
+            const targetId = e.target.dataset.scoreTarget;
+            const scoreEl = document.getElementById(targetId);
+            if (scoreEl) {
+                scoreEl.textContent = e.target.value;
+            }
+        });
+    });
+</script>

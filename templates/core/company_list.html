@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Companies{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 py-6">
+  <div class="mb-6 flex items-center justify-between">
+    <h2 class="text-2xl font-semibold">Companies</h2>
+    {% if perms.core.add_company %}
+      <a href="{% url 'core:company_create' %}" class="btn btn-primary">New company</a>
+    {% endif %}
+  </div>
+  
+  <div class="bg-white shadow-sm rounded divide-y">
+    {% for c in companies %}
+      <div class="p-4 flex items-center justify-between">
+        <div>
+          <a href="{% url 'core:company_detail' c.pk %}" class="font-medium hover:underline">{{ c.name }}</a>
+          <div class="text-sm text-gray-600">{{ c.municipality }} — NIT {{ c.tax_id }}</div>
+        </div>
+        <div class="text-sm space-x-3">
+          {% if perms.core.change_company %}
+            <a href="{% url 'core:company_update' c.pk %}" class="link">Edit</a>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <div class="p-6 text-gray-600">No companies available.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

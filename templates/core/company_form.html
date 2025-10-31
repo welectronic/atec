@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ view.object|default:'New company' }}{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 py-6">
+  <h2 class="text-2xl font-semibold mb-4">{{ view.object|default:"New company" }}</h2>
+  
+  <form method="post" class="bg-white shadow-sm rounded p-4 space-y-4" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="p-3 rounded bg-red-50 text-red-700">{{ form.non_field_errors }}</div>
+    {% endif %}
+  
+    <div class="grid md:grid-cols-2 gap-4">
+      {% for field in form %}
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            {{ field.label }}{% if field.field.required %} <span class="text-red-600">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.help_text %}<p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
+          {% for err in field.errors %}<p class="text-sm text-red-600 mt-1">{{ err }}</p>{% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  
+    <div class="flex items-center gap-3">
+      <button class="inline-flex items-center rounded bg-brand px-4 py-2 text-white hover:bg-indigo-700">Save</button>
+      <a href="{% url 'core:company_list' %}" class="text-gray-600 hover:underline">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

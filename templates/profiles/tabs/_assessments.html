@@ -1,0 +1,50 @@
+{# templates/profiles/tabs/_assessments.html #}
+
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-lg font-semibold">Evaluaciones de {{ company.name }}</h2>
+  <button
+    hx-get="{% url 'profiles:assessment_create' company.id %}"
+    hx-target="#tab-content"
+    hx-swap="innerHTML"
+    class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-green-700">
+    <i data-lucide="plus" class="h-4 w-4"></i> Nueva evaluación
+  </button>
+</div>
+
+<div class="bg-white rounded-xl shadow overflow-hidden">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instrumento</th>
+        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Analista</th>
+        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      {% for a in assessments %}
+      <tr>
+        <td class="px-4 py-2 text-sm text-gray-700">{{ a.assessment_date }}</td>
+        <td class="px-4 py-2 text-sm text-gray-700">{{ a.instrument_code }} {{ a.instrument_version }}</td>
+        <td class="px-4 py-2 text-sm text-gray-700">{{ a.analyst }}</td>
+        <td class="px-4 py-2 text-sm text-right">
+          <button
+            hx-get="{% url 'profiles:assessment_fill' company.id a.id %}"
+            hx-target="#tab-content"
+            hx-swap="innerHTML"
+            class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-medium">
+            <i data-lucide="clipboard-pen-line" class="h-4 w-4"></i>
+            Responder
+          </button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4" class="px-4 py-4 text-center text-gray-500 text-sm">
+          Aún no hay evaluaciones para esta empresa.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

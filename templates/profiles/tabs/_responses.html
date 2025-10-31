@@ -1,0 +1,25 @@
+<h2 class="text-lg font-semibold mb-4">Respuestas recientes</h2>
+
+{% for a in assessments %}
+  <div class="mb-4 bg-white rounded-xl shadow p-4">
+    <div class="flex items-center justify-between mb-2">
+      <div>
+        <p class="text-sm text-gray-500">Evaluación</p>
+        <p class="text-base font-semibold">{{ a.instrument_code }} — {{ a.assessment_date }}</p>
+      </div>
+      <p class="text-sm text-gray-500">{{ a.analyst }}</p>
+    </div>
+    <div class="border-t pt-2 space-y-1">
+      {% for r in a.responses.all %}
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-700">{{ r.question.code }} — {{ r.question.text|truncatechars:50 }}</span>
+          <span class="font-medium text-gray-900">Valor: {{ r.answer_value }} / Puntaje: {{ r.score }}</span>
+        </div>
+      {% empty %}
+        <p class="text-sm text-gray-400">Esta evaluación aún no tiene respuestas.</p>
+      {% endfor %}
+    </div>
+  </div>
+{% empty %}
+  <p class="text-sm text-gray-500">No hay evaluaciones recientes.</p>
+{% endfor %}

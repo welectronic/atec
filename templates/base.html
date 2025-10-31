@@ -1,0 +1,252 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}{{ PROGRAM.name }}{% endblock %}</title>
+
+  <!-- Tailwind (CDN) + paleta -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#0f7a4a',       // verde principal
+            brandDark: '#0b5e39',   // verde oscuro
+            teal: '#2ca67a',        // verde medio
+            mint: '#b5ebcf',        // verde claro
+            accent: '#f59e0b',      // acento naranja
+            ink: '#0f172a',         // texto
+          },
+          boxShadow: { soft: '0 12px 32px rgba(0,0,0,.08)' }
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer components {
+    /* Botones base */
+    .btn { @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2; }
+    .btn-primary { @apply bg-brand text-white hover:bg-brandDark focus:ring-brand; }
+    .btn-outline { @apply border border-brand text-brand hover:bg-mint/30 focus:ring-brand; }
+    .btn-ghost { @apply text-brand hover:text-brandDark; }
+
+    /* Enlaces corporativos */
+    .link { @apply text-brand hover:text-brandDark hover:underline; }
+
+    /* Inputs corporativos */
+    .input { @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-brand focus:ring-brand; }
+
+    /* Variante pill (si la quieres redondita) */
+    .pill { @apply rounded-full; }
+  }
+</style>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://unpkg.com/htmx.org/dist/ext/disable-element.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+
+  <style>
+    /* Patrón HTMX: mostrar/ocultar según estado de la petición */
+    .show-while-loading {
+      display: none;
+    }
+
+    .htmx-request .show-while-loading {
+      display: inline-block;
+    }
+
+    .htmx-request .hide-while-loading {
+      display: none;
+    }
+
+    /* Indicador genérico */
+    .htmx-indicator {
+      display: none;
+    }
+
+    .htmx-request .htmx-indicator {
+      display: grid;
+    }
+
+    /* Ocultar texto cuando el botón está ocupado */
+    [aria-busy="true"] .btn-label {
+      opacity: 0;
+    }
+
+    /* El indicador se muestra solo mientras hay request */
+    .htmx-indicator {
+      display: none;
+    }
+
+    .htmx-request.htmx-indicator {
+      display: flex;
+    }
+
+    /* Solo por si el navegador no respeta pointer-events del disabled */
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .6;
+    }
+  </style>
+  <script>
+    // Cursor global de “espera” mientras hay peticiones htmx
+    document.addEventListener('htmx:send', () => document.classList.add('cursor-wait'));
+    const off = () => document.body.classList.remove('cursor-wait');
+    document.addEventListener('htmx:afterOnLoad', off);
+    document.addEventListener('htmx:responseError', off);
+
+    document.addEventListener('htmx:beforeRequest', (e) => {
+      const btn = e.target;
+      if (btn) {
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
+      }
+    });
+
+    document.addEventListener('htmx:afterRequest', (e) => {
+      const btn = e.target;
+      if (btn) {
+        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+      }
+    });
+
+    // Renderiza íconos al cargar…
+    document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+    // …y tras swaps de HTMX (para contenido inyectado)
+    document.addEventListener('htmx:afterSwap', () => lucide.createIcons());
+  </script>
+
+
+
+</head>
+
+<body class="bg-gray-50 text-ink">
+  <!-- Header -->
+  <header class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="text-lg font-semibold tracking-tight text-gray-900">
+        AlimentaTec
+      </a>
+
+      {% if request.user.is_authenticated %}
+      <nav class="flex items-center gap-3">
+
+        {# === Link a Inventario (requiere company en contexto o en sesión) === #}
+        {% if company %}
+        <a href="{% url 'inventory:manage' company.id %}"
+          class="inline-flex items-center rounded-lg px-3 py-2 text-sm bg-green-700 text-white hover:bg-green-800">
+          Inventario
+        </a>
+        {% elif request.session.company_id %}
+        <a href="{% url 'inventory:manage' request.session.company_id %}"
+          class="inline-flex items-center rounded-lg px-3 py-2 text-sm bg-green-700 text-white hover:bg-green-800">
+          Inventario
+        </a>
+        {% else %}
+        <span class="inline-flex items-center rounded-lg px-3 py-2 text-sm bg-gray-200 text-gray-500 cursor-not-allowed"
+          title="Selecciona una empresa para habilitar Inventario">
+          Inventario
+        </span>
+        {% endif %}
+
+        {# === Enlace al Admin solo si es staff === #}
+        {% if request.user.is_staff %}
+        <a href="/admin/"
+          class="inline-flex items-center rounded-lg px-3 py-2 text-sm bg-gray-800 text-white hover:bg-gray-900">
+          Admin
+        </a>
+        {% endif %}
+
+        {# === Usuario y Logout === #}
+        <span class="hidden sm:inline text-sm text-gray-600">
+          {{ request.user.get_full_name|default:request.user.username }}
+        </span>
+        <a href="{% url 'logout' %}"
+          class="inline-flex items-center rounded-lg px-3 py-2 text-sm bg-gray-100 text-gray-700 hover:bg-gray-200">
+          Logout
+        </a>
+
+      </nav>
+      {% else %}
+      <nav class="flex items-center gap-3">
+        <a href="{% url 'login' %}"
+          class="inline-flex items-center rounded-lg px-3 py-2 text-sm bg-green-700 text-white hover:bg-green-800">
+          Login
+        </a>
+      </nav>
+      {% endif %}
+    </div>
+  </header>
+  <!-- Contenido -->
+  <main class="max-w-8xl mx-auto px-4 py-6">
+    {% if messages %}
+    <div class="mb-4 space-y-2">
+      {% for m in messages %}
+      <div class="rounded px-3 py-2 border
+                        {% if 'error' in m.tags %}border-red-300 bg-red-50 text-red-800
+                        {% else %}border-emerald-300 bg-mint/50 text-brandDark{% endif %}">
+        {{ m }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer corporativo -->
+  <footer class="mt-12">
+    <!-- Banda contacto -->
+    <section class="bg-gradient-to-r from-brand to-teal text-white">
+      <div class="max-w-6xl mx-auto px-4 py-6 grid sm:grid-cols-2 gap-6 items-center">
+        <div>
+          <h3 class="text-lg font-semibold">Más información</h3>
+          <p class="opacity-90 text-sm">Escríbenos y con gusto te atenderemos.</p>
+        </div>
+        <div class="flex flex-wrap gap-4 text-sm">
+          {% if PROGRAM.phone %}
+          <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1">
+            <span>📞</span><span>{{ PROGRAM.phone }}</span>
+          </span>
+          {% endif %}
+          {% if PROGRAM.email %}
+          <a class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 hover:bg-white/20"
+            href="mailto:{{ PROGRAM.email }}">
+            <span>✉</span><span>{{ PROGRAM.email }}</span>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Logos aliados -->
+    <section class="bg-white">
+      <div class="max-w-6xl mx-auto px-4 py-6 flex flex-wrap items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          {% if STATIC_URL %}
+          <img src="{% static 'img/logo-cib.png' %}" class="h-10" alt="CIB" onerror="this.style.display='none'">
+          <img src="{% static 'img/logo-gob-antioquia.png' %}" class="h-10" alt="Gobernación de Antioquia"
+            onerror="this.style.display='none'">
+          {% endif %}
+        </div>
+        <p class="text-xs text-gray-500">© {{ PROGRAM.name }} — {{ now|date:"Y" }}</p>
+      </div>
+    </section>
+  </footer>
+  <div id="modal">
+
+    <!-- overlay y spinner globales para carga del modal -->
+    <div id="modal-overlay" class="hidden fixed inset-0 bg-black/30"></div>
+
+  </div>
+  <div id="modal-indicator" class="hidden">
+    <!-- skeleton de cargando -->
+    Cargando ...
+  </div>
+</body>
+
+</html>

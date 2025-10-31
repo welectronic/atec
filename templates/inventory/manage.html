@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Inventario tecnológico — {{ company.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 py-6">
+  <!-- Header -->
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Inventario tecnológico</h1>
+      <p class="text-sm text-gray-500">Empresa:
+        <span class="font-medium text-gray-800">{{ company.name }}</span>
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button id="sidebar-toggle"
+        class="md:hidden inline-flex items-center rounded-lg px-3 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200">
+        Menú
+      </button>
+      <a href="{% url 'core:company_update' company.id %}"
+        class="hidden md:inline text-sm underline text-gray-600">Editar empresa</a>
+      <a href="{% url 'logout' %}"
+        class="inline-flex items-center rounded-lg px-3 py-2 bg-green-700 text-white hover:bg-green-800">Logout</a>
+    </div>
+  </div>
+
+  <div class="flex gap-5">
+    <!-- Sidebar: htmx boost -->
+    <aside id="inventory-sidebar" class="w-64 shrink-0 bg-white rounded-2xl shadow p-3 md:p-4 md:block hidden">
+      <nav class="space-y-2" hx-boost="true" hx-target="#tab-content" hx-swap="innerHTML" hx-push-url="true">
+        {% with tab=current_tab %}
+
+        {# — Inventario Tecnológico — #}
+        <details class="group" {% if tab in 'equipment services maintenance' %}open{% endif %}>
+          <summary class="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer select-none
+                      text-gray-700 hover:bg-gray-100">
+            <span class="inline-flex items-center gap-3">
+              <i data-lucide="factory" class="h-5 w-5 text-gray-500" aria-hidden="true"></i>
+              <span class="text-sm font-medium">Inventario tecnológico</span>
+            </span>
+            <i data-lucide="chevron-down" class="h-4 w-4 transition-transform group-open:rotate-180"></i>
+          </summary>
+
+          <ul class="mt-1 space-y-1 pl-2">
+            <li>
+              <a data-tab="equipment" href="{% url 'inventory:manage' company.id %}?tab=equipment" class="group flex items-center gap-3 px-3 py-2 rounded-lg
+                    {% if tab == 'equipment' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                <i data-lucide="cog"
+                  class="h-5 w-5 {% if tab == 'equipment' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+                <span class="text-sm font-medium">Máquinas y equipos</span>
+              </a>
+            </li>
+            <li>
+              <a data-tab="services" href="{% url 'inventory:manage' company.id %}?tab=services" class="group flex items-center gap-3 px-3 py-2 rounded-lg
+                    {% if tab == 'services' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                <i data-lucide="briefcase"
+                  class="h-5 w-5 {% if tab == 'services' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+                <span class="text-sm font-medium">Servicio técnico</span>
+              </a>
+            </li>
+            <li>
+              <a data-tab="maintenance" href="{% url 'inventory:manage' company.id %}?tab=maintenance" class="group flex items-center gap-3 px-3 py-2 rounded-lg
+                    {% if tab == 'maintenance' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                <i data-lucide="wrench"
+                  class="h-5 w-5 {% if tab == 'maintenance' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+                <span class="text-sm font-medium">Mantenimiento</span>
+              </a>
+            </li>
+          </ul>
+        </details>
+
+        <hr>
+
+        {# — Métodos de trabajo — #}
+        <details class="group" {% if tab in 'methods layout software' %}open{% endif %}>
+          <summary class="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer select-none
+                      text-gray-700 hover:bg-gray-100">
+            <span class="inline-flex items-center gap-3">
+              <i data-lucide="workflow" class="h-5 w-5 text-gray-500" aria-hidden="true"></i>
+              <span class="text-sm font-medium">Métodos de trabajo</span>
+            </span>
+            <i data-lucide="chevron-down" class="h-4 w-4 transition-transform group-open:rotate-180"></i>
+          </summary>
+
+          <ul class="mt-1 space-y-1 pl-2">
+            <li>
+              <a data-tab="methods" href="{% url 'inventory:manage' company.id %}?tab=methods" class="group flex items-center gap-3 px-3 py-2 rounded-lg
+                    {% if tab == 'methods' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                <i data-lucide="list-tree"
+                  class="h-5 w-5 {% if tab == 'methods' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+                <span class="text-sm font-medium">Modalidades</span>
+              </a>
+            </li>
+            <li>
+              <a data-tab="layout" href="{% url 'inventory:manage' company.id %}?tab=layout" class="group flex items-center gap-3 px-3 py-2 rounded-lg
+                    {% if tab == 'layout' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                <i data-lucide="layout-grid"
+                  class="h-5 w-5 {% if tab == 'layout' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+                <span class="text-sm font-medium">Layout</span>
+              </a>
+            </li>
+            <li>
+              <a data-tab="software" href="{% url 'inventory:manage' company.id %}?tab=software" class="group flex items-center gap-3 px-3 py-2 rounded-lg
+                    {% if tab == 'software' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                <i data-lucide="code-2"
+                  class="h-5 w-5 {% if tab == 'software' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+                <span class="text-sm font-medium">Software</span>
+              </a>
+            </li>
+          </ul>
+        </details>
+
+        <hr>
+
+        {# — Talento humano — #}
+        <details class="group" {% if tab in 'disciplines workforce' %}open{% endif %}>
+          <summary class="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer select-none
+                      text-gray-700 hover:bg-gray-100">
+            <span class="inline-flex items-center gap-3">
+              <i data-lucide="users" class="h-5 w-5 text-gray-500"></i>
+              <span class="text-sm font-medium">Talento humano</span>
+            </span>
+            <i data-lucide="chevron-down" class="h-4 w-4 transition-transform group-open:rotate-180"></i>
+          </summary>
+
+          <ul class="mt-1 space-y-1 pl-2">
+            <li>
+              <a data-tab="disciplines" href="{% url 'inventory:manage' company.id %}?tab=disciplines" class="group flex items-center gap-3 px-3 py-2 rounded-lg
+                    {% if tab == 'disciplines' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                <i data-lucide="graduation-cap"
+                  class="h-5 w-5 {% if tab == 'disciplines' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+                <span class="text-sm font-medium">Saber / disciplina</span>
+              </a>
+            </li>
+            <li>
+              <a data-tab="workforce" href="{% url 'inventory:manage' company.id %}?tab=workforce" class="group flex items-center gap-3 px-3 py-2 rounded-lg
+                    {% if tab == 'workforce' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                <i data-lucide="id-card"
+                  class="h-5 w-5 {% if tab == 'workforce' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+                <span class="text-sm font-medium">Personal</span>
+              </a>
+            </li>
+          </ul>
+        </details>
+
+        <hr>
+
+        {# — Materiales e insumos (sin subitems, navega directo) — #}
+        <a data-tab="materials" href="{% url 'inventory:manage' company.id %}?tab=materials" class="group flex items-center gap-3 px-3 py-2 rounded-lg
+              {% if tab == 'materials' %}bg-green-50 text-green-700 border border-green-200
+              {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+          <i data-lucide="boxes"
+            class="h-5 w-5 {% if tab == 'materials' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+          <span class="text-sm font-medium">Materiales e insumos</span>
+        </a>
+
+        <hr>
+
+        {# — Inversiones — #}
+        <details class="group" {% if tab == 'investments' %}open{% endif %}>
+          <summary class="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer select-none
+                      text-gray-700 hover:bg-gray-100">
+            <span class="inline-flex items-center gap-3">
+              <i data-lucide="coins" class="h-5 w-5 text-gray-500"></i>
+              <span class="text-sm font-medium">Inversiones</span>
+            </span>
+            <i data-lucide="chevron-down" class="h-4 w-4 transition-transform group-open:rotate-180"></i>
+          </summary>
+
+          <ul class="mt-1 space-y-1 pl-2">
+            <li>
+              <a data-tab="investments" href="{% url 'inventory:manage' company.id %}?tab=investments&kind=equipment"
+                class="group flex items-center gap-3 px-3 py-2 rounded-lg
+                    {% if tab == 'investments' and request.GET.kind == 'equipment' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                <i data-lucide="wrench"
+                  class="h-5 w-5 {% if tab == 'investments' and request.GET.kind == 'equipment' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+                <span class="text-sm font-medium">Maquinaria y equipos</span>
+              </a>
+            </li>
+            <li>
+              <a data-tab="investments" href="{% url 'inventory:manage' company.id %}?tab=investments&kind=technology"
+                class="group flex items-center gap-3 px-3 py-2 rounded-lg
+                    {% if tab == 'investments' and request.GET.kind == 'technology' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                <i data-lucide="cpu"
+                  class="h-5 w-5 {% if tab == 'investments' and request.GET.kind == 'technology' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+                <span class="text-sm font-medium">Desarrollo tecnológico</span>
+              </a>
+            </li>
+          </ul>
+        </details>
+
+        <hr>
+
+        {# — Resumen & Validación (directo) — #}
+        <a data-tab="summary" href="{% url 'inventory:manage' company.id %}?tab=summary" class="group flex items-center gap-3 px-3 py-2 rounded-lg
+              {% if tab == 'summary' %}bg-green-50 text-green-700 border border-green-200
+              {% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+          <i data-lucide="clipboard-check"
+            class="h-5 w-5 {% if tab == 'summary' %}text-green-700{% else %}text-gray-500{% endif %}"></i>
+          <span class="text-sm font-medium">Resumen &amp; Validación</span>
+        </a>
+
+        {% endwith %}
+      </nav>
+    </aside>
+
+
+    <!-- Contenido -->
+    <main class="flex-1">
+      <div id="tab-content" class="bg-white rounded-2xl shadow p-4 md:p-6">
+        {% include partial %}
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  // Toggle del sidebar en móvil
+  (function () {
+    const btn = document.getElementById('sidebar-toggle');
+    const aside = document.getElementById('inventory-sidebar');
+    if (btn && aside) {
+      btn.addEventListener('click', () => {
+        aside.classList.toggle('hidden');
+        aside.classList.toggle('block');
+      });
+    }
+  })();
+
+
+  // Mostrar/ocultar overlay cuando hay una petición HTMX hacia el modal
+  const overlay = document.getElementById('modal-overlay');
+  document.getElementById('modal-container')?.addEventListener('htmx:send', () => {
+    overlay?.classList.remove('hidden');
+  });
+  document.getElementById('modal-container')?.addEventListener('htmx:afterOnLoad', () => {
+    overlay?.classList.add('hidden');
+  });
+  document.getElementById('modal-container')?.addEventListener('htmx:responseError', () => {
+    overlay?.classList.add('hidden');
+  });
+
+
+  // Resaltar item activo según ?tab=...
+  function highlightActiveFromURL() {
+    const url = new URL(window.location.href);
+    const current = url.searchParams.get('tab') || 'equipment';
+    document.querySelectorAll('#inventory-sidebar a[data-tab]').forEach(a => {
+      const isActive = a.dataset.tab === current;
+      a.classList.toggle('bg-green-50', isActive);
+      a.classList.toggle('text-green-700', isActive);
+      a.classList.toggle('border', isActive);
+      a.classList.toggle('border-green-200', isActive);
+      if (!isActive) {
+        a.classList.remove('bg-green-50', 'text-green-700', 'border', 'border-green-200');
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', highlightActiveFromURL);
+  document.body.addEventListener('htmx:afterSwap', highlightActiveFromURL);
+</script>
+{% endblock %}

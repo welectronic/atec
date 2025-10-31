@@ -1,0 +1,39 @@
+{% load static %}
+
+<div class="fixed inset-0 z-50">
+  <div class="absolute inset-0 bg-black/30" onclick="document.getElementById('modal').innerHTML=''"></div>
+  <div class="relative mx-auto mt-16 w-[95%] max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-gray-200">
+    <div class="flex items-center justify-between border-b px-6 py-4">
+      <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
+      <button class="rounded-md px-2 py-1 text-gray-500 hover:bg-gray-100" onclick="document.getElementById('modal').innerHTML=''">×</button>
+    </div>
+
+    {% if action == 'create' %}
+      {% url 'inventory:discipline_create' company.id as form_action %}
+    {% else %}
+      {% url 'inventory:discipline_update' object.id as form_action %}
+    {% endif %}
+
+    <form hx-post="{{ form_action }}" hx-target="#modal" hx-swap="innerHTML" hx-on::after-request="document.getElementById('modal').innerHTML=''" hx-disabled-elt="button[type=submit]" class="px-6 py-5 space-y-5">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+        {% include "components/form_field.html" with field=form.item label="Disciplina" required=True %}
+        {% include "components/form_field.html" with field=form.importance_score label="Importancia (1-5)" required=True %}
+        {% include "components/form_field.html" with field=form.adoption_level label="Adopción (0-4)" required=True %}
+        <div class="md:col-span-2">
+          {% include "components/form_field.html" with field=form.notes label="Notas" %}
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 border-t pt-4">
+        <button type="button" class="rounded-lg px-3 py-2 border text-gray-700 hover:bg-gray-50" onclick="document.getElementById('modal').innerHTML=''">Cancelar</button>
+        <button type="submit" class="rounded-lg px-4 py-2 bg-emerald-700 text-white hover:bg-emerald-800 disabled:opacity-60">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+

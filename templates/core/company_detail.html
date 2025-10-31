@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}Empresa: {{ object.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 py-6 space-y-6">
+
+  <!-- Encabezado -->
+  <div
+    class="bg-white rounded-2xl shadow-sm px-5 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="flex items-start gap-3">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-green-700">
+        <!-- icono empresa -->
+        <i data-lucide="building-2" class="h-6 w-6"></i>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-wide text-gray-400 mb-1">Empresa</p>
+        <h1 class="text-2xl font-semibold text-gray-900 leading-tight">
+          {{ object.name }}
+        </h1>
+        <p class="text-sm text-gray-500 flex items-center gap-1">
+          <i data-lucide="map-pin" class="h-4 w-4 text-gray-400"></i>
+          {{ object.municipality|default:"Sin municipio" }}
+        </p>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      {% if perms.core.change_company %}
+      <a href="{% url 'core:company_update' object.pk %}"
+        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-green-200 text-green-700 text-sm hover:bg-green-50">
+        <i data-lucide="pencil-line" class="h-4 w-4"></i>
+        Editar
+      </a>
+      {% endif %}
+      <a href="{% url 'core:company_list' %}"
+        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 text-gray-700 text-sm hover:bg-gray-50">
+        <i data-lucide="arrow-left" class="h-4 w-4"></i>
+        Volver
+      </a>
+    </div>
+  </div>
+
+  <!-- Grid principal -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Columna izquierda: ficha -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Datos básicos -->
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <h2 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i data-lucide="clipboard-list" class="h-4 w-4 text-green-500"></i>
+          Información general
+        </h2>
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-start gap-3">
+            <div class="h-9 w-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+              <i data-lucide="hash" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-gray-400 mb-1">NIT</dt>
+              <dd class="text-sm text-gray-900">{{ object.tax_id|default:"—" }}</dd>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="h-9 w-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+              <i data-lucide="map-pin" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-gray-400 mb-1">Municipio</dt>
+              <dd class="text-sm text-gray-900">{{ object.municipality|default:"—" }}</dd>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="h-9 w-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+              <i data-lucide="calendar" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-gray-400 mb-1">Fecha de registro</dt>
+              <dd class="text-sm text-gray-900">{{ object.assessment_date|default:"—" }}</dd>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="h-9 w-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+              <i data-lucide="building" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-gray-400 mb-1">Tipo de organización</dt>
+              <dd class="text-sm text-gray-900">
+                {{ object.get_org_type_display|default:"—" }}
+              </dd>
+            </div>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Contacto y descripción -->
+      <!-- Contacto y descripción con mismo formato -->
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <h2 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i data-lucide="contact" class="h-4 w-4 text-green-500"></i>
+          Contacto principal
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Nombre y rol -->
+          <div class="flex gap-3 items-start">
+            <div class="h-9 w-9 rounded-lg bg-green-50 flex items-center justify-center text-green-500">
+              <i data-lucide="user-round" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-400">Contacto</p>
+              <p class="text-sm font-medium text-gray-900">
+                {{ object.contact_name|default:"Sin contacto" }}
+              </p>
+              <p class="text-xs text-gray-500">
+                {{ object.contact_role|default:"—" }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Correo -->
+          <div class="flex gap-3 items-start">
+            <div class="h-9 w-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+              <i data-lucide="mail" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-400">Correo</p>
+              <p class="text-sm text-gray-900">
+                {% if object.contact_email %}
+                {{ object.contact_email }}
+                {% else %}
+                —
+                {% endif %}
+              </p>
+            </div>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="flex gap-3 items-start">
+            <div class="h-9 w-9 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+              <i data-lucide="phone" class="h-4 w-4"></i>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-400">Teléfono</p>
+              <p class="text-sm text-gray-900">
+                {% if object.contact_phone %}
+                {{ object.contact_phone }}
+                {% else %}
+                —
+                {% endif %}
+              </p>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Columna derecha: instrumentos aplicables -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <h2 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i data-lucide="sparkles" class="h-4 w-4 text-green-500"></i>
+          Instrumentos aplicables
+        </h2>
+        <p class="text-xs text-gray-500 mb-3">
+          Selecciona el módulo con el que quieres trabajar para esta empresa.
+        </p>
+
+        <div class="space-y-3">
+          <!-- INVENTARIO -->
+          <a href="{% url 'inventory:manage' object.id %}"
+            class="flex items-center justify-between gap-3 rounded-xl border border-green-100 bg-green-50 hover:bg-green-100 transition px-3 py-3">
+            <div class="flex items-center gap-3">
+              <span class="h-10 w-10 rounded-lg bg-white flex items-center justify-center text-green-500 shadow-sm">
+                <i data-lucide="boxes" class="h-5 w-5"></i>
+              </span>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Inventario / activos</p>
+                <p class="text-xs text-gray-500">Equipos, recursos y gestión asociada</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="h-5 w-5 text-green-500"></i>
+          </a>
+
+          <!-- PROFILES / DIAGNÓSTICO -->
+          <a href="{% url 'profiles:manage' object.id %}"
+            class="flex items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-indigo-50 hover:bg-indigo-100 transition px-3 py-3">
+            <div class="flex items-center gap-3">
+              <span class="h-10 w-10 rounded-lg bg-white flex items-center justify-center text-indigo-500 shadow-sm">
+                <i data-lucide="clipboard-check" class="h-5 w-5"></i>
+              </span>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Perfiles / diagnóstico</p>
+                <p class="text-xs text-gray-500">Aplicar instrumentos, registrar respuestas</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="h-5 w-5 text-indigo-500"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Extra: estado o notas -->
+      <div class="bg-white rounded-2xl shadow-sm p-5">
+        <h2 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <i data-lucide="factory" class="h-4 w-4 text-green-500"></i>
+          Descripcion de la empresa
+        </h2>
+        <p class="text-sm text-gray-500">
+          {% if object.description %}
+          {{ object.description }}
+          {% else %}
+          —
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
