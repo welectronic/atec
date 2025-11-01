@@ -67,5 +67,5 @@ class CompanyUpdateView(LoginRequiredMixin, PermissionRequiredMixin, CompanyScop
     model = Company
     form_class = CompanyForm
     template_name = "core/company_form.html"
-    success_url = reverse_lazy("company_list")
+    success_url = reverse_lazy("core:company_list")
     is_company_model = True  # para scoping del objeto
