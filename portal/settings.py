@@ -33,7 +33,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "change-me")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,159.203.131.106,kairos.alimentatec.co,kairos-test.alimentatec.co").split(",")
 
 
 # Application definition
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "django_filters",
     "apps.accounts",
-    "apps.core", 
+    "apps.core",
     "apps.inventory",
     "apps.profiles",
 ]
@@ -150,7 +150,12 @@ AUTH_USER_MODEL = 'accounts.User'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = "/home/django/static/"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = "/home/django/media/"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
