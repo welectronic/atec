@@ -14,13 +14,8 @@ class Organization(models.Model):
 
 class Company(models.Model):
     class CompanyType(models.TextChoices):
-        COMPANY = "company", "Empresa"
-        COOPERATIVE = "cooperative", "Cooperativa"
-        ASSOCIATION = "association", "Asociación"
-        FOUNDATION = "foundation", "Fundación"
-        NGO = "ngo", "ONG"
-        PUBLIC = "public", "Entidad pública"
-        OTHER = "other", "Otra"
+        ORGANIZATION = "organization", "Organización"
+        ENTREPRENEURSHIP = "entrepreneurship", "Emprendimiento"
 
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE, related_name="companies"
@@ -38,7 +33,7 @@ class Company(models.Model):
     contact_phone = models.CharField(max_length=32, verbose_name="Celular de contacto")
 
     org_type = models.CharField(
-        max_length=32, choices=CompanyType.choices, default=CompanyType.COMPANY,
+        max_length=32, choices=CompanyType.choices, default=CompanyType.ORGANIZATION,
         verbose_name="Tipo de organización",
     )
     description = models.TextField(blank=True, verbose_name="Descripción de la organización")
